@@ -3,13 +3,14 @@ import json
 import os
 import neuralcoref
 import spacy
-import torch
 import nltk
 import opennre
+import sys
 import pandas as pd
 from dotenv import load_dotenv
 from urllib import parse, request
 from seamless_re.utils import read_file
+from utils import read_file
 
 import logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
@@ -114,11 +115,11 @@ def relation_extraction(text: str, entities: list):
                 triples.append(
                     {
                         "head": permutation[0]["title"],
-                        "relation": permutation[1]["title"],
+                        "relation": data[0],
+                        "tail": permutation[1]["title"],
                         "score": data[1],
                     }
                 )
-
     return pd.DataFrame(triples)
 
 def process(text: str):
@@ -131,18 +132,18 @@ def process(text: str):
         if len(entities) > 1:
             triples.append(relation_extraction(text=sentence, entities=entities))
         
-        if triples:
-            df = (
-                pd.concat(triples)
-                .sort_values(by="score", ascending=False)
-                .drop_duplicates(keep="first",subset=['head','tail'])
-                .reset_index(drop=True)
-            )
-            return df
-        else:
-            return pd.DataFrame(columns=["head", "relation", "tail", "score"])
+    if triples:
+        return (
+            pd.concat(triples)
+            .sort_values(by="score", ascending=False)
+            .drop_duplicates(keep="first",subset=['head','tail'])
+            .reset_index(drop=True)
+        )
+    return pd.DataFrame(columns=["head", "relation", "tail", "score"])
 
 
 if __name__ == "__main__":
-    print('main')
-
+    file_path = sys.argv[1]
+    text = read_file(file_path)
+    process = process(text)
+    print(process)
