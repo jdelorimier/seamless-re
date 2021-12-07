@@ -29,3 +29,10 @@ View shell pipeline in `./notebooks/dev-nb.ipynb`
 #### Development pipeline
 
 Primary pipeline development will occur in `./seamless_re/pipeline.py`
+
+
+### Dependincies issues
+
+Currently we have to peg huggingface's `transformers` library at 3.5.1 due to conflicts with the modeles in `OpenNRE`
+
+To utilize newer transformers like `LUKE` we will need to update to 4.0 library
