@@ -5,6 +5,7 @@ from seamless_re.utils import read_file
 from utils import read_file
 from ner import spacy_ner, coreference
 from relation import relation_extraction_spacy
+from collection import get_id_and_background
 
 import logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
@@ -32,7 +33,16 @@ def process(text: str, ner=spacy_ner, relation=relation_extraction_spacy):
 
 
 if __name__ == "__main__":
-    file_path = sys.argv[1]
-    text = read_file(file_path)
-    process = process(text)
-    print(process)
+    
+    ticker = sys.argv[1]
+    count = sys.argv[2]
+    
+    # text = read_file(file_path)
+    filings = get_id_and_background(ticker, count)
+    if len(filings) == 0:
+        print(f"No filings found for {ticker}")
+    else:
+        for text in filings:
+            # print(text)
+            output = process(text)
+            print(output)

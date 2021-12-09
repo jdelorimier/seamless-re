@@ -18,6 +18,8 @@ spacy = "2.1.0"
 python-dotenv = "^0.19.2"
 neuralcoref = "^4.0"
 smart-open = "^5.2.1"
+bs4 = "^0.0.1"
+sec-edgar-downloader = "^4.2.2"
 
 
 [tool.poetry.dev-dependencies]
