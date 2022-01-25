@@ -14,12 +14,15 @@ nltk.download("punkt")
 
 def process(text: str, ner=spacy_ner, relation=relation_extraction_spacy):
     triples = []
+    # preform coreference: "Joe Biden is president. He lives in Deleware." -> "Joe Biden is president. Joe Biden lives in Deleware."
     text = coreference(text=text)
 
     tokenized_sentences = nltk.sent_tokenize(text)
     for sentence in tokenized_sentences:
+        # Preform NER sentence by sentence.
         entities = ner(text=sentence)
         if len(entities) > 1:
+            # Preform RE on each entity in the sentences.
             triples.append(relation(text=sentence, entities=entities))
         
     if triples:

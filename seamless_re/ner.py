@@ -67,7 +67,8 @@ def wikipedia_el(text: str, pageRankSqThreshold = 0.8):
 
 ######## SPACY NER #########
 
-nlp = spacy.load('en_core_web_sm')
+nlp = spacy.load('en_core_web_lg')
+# python -m spacy download en_core_web_lg
 neuralcoref.add_to_pipe(nlp)
 
 def coreference(text: str):
@@ -100,6 +101,8 @@ def spacy_ner(text):
     position: tuple( start, end)
     label: entity type
     """
+    "Entity_labels here: https://spacy.io/models/en"
+    ENTITY_LABLES = ['ORG','PERSON',] 
     doc = nlp(text)
     output = []
     entities = doc.ents
@@ -108,13 +111,14 @@ def spacy_ner(text):
             start_char = ent.start_char
             end_char = ent.end_char
             label = ent.label_
-            output.append(
-                {
-                    "ent": ent.text,
-                    "positions":
-                        (start_char, end_char),
-                    "label":label
-                } 
-            )
+            if label in ENTITY_LABLES:
+                output.append(
+                    {
+                        "ent": ent.text,
+                        "positions":
+                            (start_char, end_char),
+                        "label":label
+                    } 
+                )
 
     return output
