@@ -38,11 +38,14 @@ def get_id_and_background(ticker, amount=1, filing_type="SC 13D",download_path="
 
     output:
     text_blobs (list): A list of text blobs of the given amount of filings. Some of these may be empty
+    file_paths (list): paths to files
     """
+    print("Collecting Data...")
     dl = Downloader(download_path)
     dl.get(filing_type, ticker, amount = amount)
     htmls = glob.glob(f"/tmp/sec-edgar-filings/{ticker}/{filing_type}/*/*.html")
     text_blobs = []
     for html in htmls:
         text_blobs.append(text_extract_13D(html))
-    return text_blobs 
+    print("Data collection complete.")
+    return text_blobs, htmls

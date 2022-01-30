@@ -45,7 +45,8 @@ def get_relationships(db):
 
 
 def get_graph(db):
-    command = "MATCH (n1)-[e:FRIENDS]-(n2) RETURN n1,n2,e;"
+    # command = "MATCH (n1)-[e:FRIENDS]-(n2) RETURN n1,n2,e;"
+    command = """MATCH (n1)-[e]-(n2) RETURN n1, n2, e;"""
     relationships = db.execute_and_fetch(command)
 
     link_objects = []
@@ -62,7 +63,7 @@ def get_graph(db):
             node_objects.append(data)
             added_nodes.append(n1.id)
 
-        n2 = relationship['n2']
+        n2 = relationship['n2'] 
         if not (n2.id in added_nodes):
             data = {"id": n2.id, "name": n2.properties['name']}
             node_objects.append(data)
