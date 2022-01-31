@@ -15,17 +15,33 @@ RUN python3 -m pip install -U pip \
 
 ENV PATH="${PATH}:/root/.poetry/bin"
 
+RUN git clone https://github.com/thunlp/OpenNRE.git && \
+    # pip install -r OpenNRE/requirements.txt \
+    # python3 OpenNRE/setup.py install \
+    # bash OpenNRE/benchmark/download_fewrel.sh
+    apt-get install wget && \
+    mv OpenNRE ~/.opennre && \
+    mkdir ~/.opennre/benchmark/wiki80 && \ 
+    wget -P ~/.opennre/benchmark/wiki80 https://thunlp.oss-cn-qingdao.aliyuncs.com/opennre/benchmark/wiki80/wiki80_rel2id.json && \
+    wget -P ~/.opennre/pretrain/bert-base-uncased https://thunlp.oss-cn-qingdao.aliyuncs.com/opennre/pretrain/bert-base-uncased/config.json  && \
+    wget -P ~/.opennre/pretrain/bert-base-uncased https://thunlp.oss-cn-qingdao.aliyuncs.com/opennre/pretrain/bert-base-uncased/pytorch_model.bin  && \
+    wget -P ~/.opennre/pretrain/bert-base-uncased https://thunlp.oss-cn-qingdao.aliyuncs.com/opennre/pretrain/bert-base-uncased/vocab.txt
+
+
 WORKDIR /app
 COPY poetry.lock pyproject.toml /app/
 
 RUN poetry config virtualenvs.create false && \
     poetry install --no-interaction --no-ansi
 
+# Download spacy packages
+RUN python3 -m spacy download en_core_web_lg
+
 COPY . /app
 EXPOSE 5000
 
-ADD seamless_re/start.sh /
-RUN chmod +x seamless_re/start.sh
+ADD start.sh /
+RUN chmod +x /start.sh
 
 ENTRYPOINT [ "poetry", "run" ]
-CMD ["seamless_re/start.sh"]
+CMD ["/start.sh"]

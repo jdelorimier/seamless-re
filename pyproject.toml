@@ -22,6 +22,7 @@ bs4 = "^0.0.1"
 sec-edgar-downloader = "^4.2.2"
 flask = "^1.1.2"
 pymgclient = "1.1.0"
+html2text = "^2020.1.16"
 
 
 [tool.poetry.dev-dependencies]

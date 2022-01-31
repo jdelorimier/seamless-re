@@ -1,10 +1,10 @@
-version: '1'
+version: '2.2'
 services:
   memgraph:
     image: memgraph/memgraph
     ports:
       - "7687:7687"
-  sng_demo:
+  seamless_re:
     build: .
     volumes:
       - .:/app
