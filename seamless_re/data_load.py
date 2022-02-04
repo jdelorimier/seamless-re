@@ -27,13 +27,19 @@ input = pd.DataFrame(
 )
 
 
-def populate_database(db, input: list, file_source):
+def populate_database(db, input: list, file_source: str, ticker: str):
+
+    # Make Central Company Node
+    command = """MERGE (n:ORG {{ name: '{ticker}', id: 0}});""".format(ticker=ticker)
+    db.execute_query(command)
+
+
     # look at head and tail and make single list of nodes
     input = input.to_dict('records')
 
     if len(input) > 0:
         ticker = input[0].get('ticker')
-        command = """CREATE (n:file {{ path:'{path_to_file}', name: '{ticker} filing'}});""".format(path_to_file=file_source,ticker=ticker)
+        command = """CREATE (n:file {{ id: '{path_to_file}', path: '{path_to_file}', name: '{ticker} filing'}});""".format(path_to_file=file_source,ticker=ticker)
         db.execute_query(command)
 
     for line in input:
@@ -46,22 +52,29 @@ def populate_database(db, input: list, file_source):
         tail_id = line.get('tail_id')
         relation = relation.replace(" ","")
         i = 1
-        # make new node
+        # make head node
         # Update if node does not exist
-        # command = """MERGE (n:{entiy_type} {{ id:{head_id}, name: '{head}'}});""".format(entiy_type = entity_type_head,head_id=head_id,head=head)
         command = """MERGE (n:{entiy_type} {{ name: '{head}', id: '{head_id}'}});""".format(entiy_type = head_label,head=head,head_id=head_id)
         db.execute_query(command)
-        # command = """MERGE (n:{entiy_type} {{ id:{tail_id}, name: '{tail}'}});""".format(entiy_type = entity_type_tail,tail_id=tail_id,tail=tail)
+        # Make tail node
         command = """MERGE (n:{entiy_type} {{ name: '{tail}', id: '{tail_id}'}});""".format(entiy_type = tail_label,tail=tail,tail_id=tail_id)
         db.execute_query(command)
 
-        # Match entity to file
+        #### Make relations
+        #  Match file to central node
+        command = """MATCH (a:ORG),(b:file) WHERE a.id = 0 AND b.path = '{path_to_file}' MERGE (a)<-[r:filing_of]-(b);""".format(
+            path_to_file=file_source,
+        )
+        db.execute_query(command)
+
+        # Match head entity to file
         command = """MATCH (a:file),(b:{tail_label}) WHERE a.path = '{path_to_file}' AND b.id = '{tail_id}' MERGE (a)<-[r:appears_in]-(b);""".format(
             tail_label=tail_label,
             tail_id=tail_id,
             path_to_file=file_source,
         )
         db.execute_query(command)
+        # Match tail entity to file
         command = """MATCH (a:file),(b:{head_label}) WHERE a.path = '{path_to_file}' AND b.id = '{head_id}' MERGE (a)<-[r:appears_in]-(b);""".format(
             head_label=head_label,
             head_id=head_id,
@@ -69,7 +82,7 @@ def populate_database(db, input: list, file_source):
         )
         db.execute_query(command)
 
-
+        # Match head and tail entitites to each other
         command = """MATCH (a:{head_label}),(b:{tail_label}) WHERE a.id = '{head_id}' AND b.id = '{tail_id}' CREATE (a)-[r:{relation}]->(b);""".format(
             head = head,
             tail = tail,

@@ -23,7 +23,7 @@ def submit_query():
 
     db = Memgraph()
     db_operations.clear(db)
-    filings, file_paths = collection.get_id_and_background(processed_ticker, 3)
+    filings, file_paths = collection.get_id_and_background(processed_ticker, 20)
     if len(filings) == 0:
         pass
     else:
@@ -32,7 +32,7 @@ def submit_query():
         for text, file_path in zip(filings, file_paths):
             data= process(text, ticker, index= i)
             i += 1
-            data_load.populate_database(db, input=data,file_source=file_path)
+            data_load.populate_database(db, input=data,file_source=file_path, ticker=ticker)
     return render_template('index.html')
 
 @app.route('/query')
