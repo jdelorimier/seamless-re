@@ -84,7 +84,7 @@
         d3.select("#tooltip_header")
             .text(d['name']);
         d3.select("#value_tt_01")
-            .text(d['name'] + ',' + d['id']);
+            .text("Type: " + d['type']);
         d3.select('#link_tt_01')
             .attr("href", d['path'])
             .text("Link to filing")

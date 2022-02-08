@@ -27,7 +27,7 @@ input = pd.DataFrame(
 )
 
 
-def populate_database(db, input: list, file_source: str, ticker: str):
+def populate_database(db, input: list, ticker: str):
 
     # Make Central Company Node
     command = """MERGE (n:ORG {{ name: '{ticker}', id: 0}});""".format(ticker=ticker)
@@ -39,7 +39,8 @@ def populate_database(db, input: list, file_source: str, ticker: str):
 
     if len(input) > 0:
         ticker = input[0].get('ticker')
-        command = """CREATE (n:file {{ id: '{path_to_file}', path: '{path_to_file}', name: '{ticker} filing'}});""".format(path_to_file=file_source,ticker=ticker)
+        url = input[0].get('url')
+        command = """CREATE (n:file {{ id: '{path_to_file}', path: '{path_to_file}', name: '{ticker} filing'}});""".format(path_to_file=url,ticker=ticker)
         db.execute_query(command)
 
     for line in input:
@@ -63,7 +64,7 @@ def populate_database(db, input: list, file_source: str, ticker: str):
         #### Make relations
         #  Match file to central node
         command = """MATCH (a:ORG),(b:file) WHERE a.id = 0 AND b.path = '{path_to_file}' MERGE (a)<-[r:filing_of]-(b);""".format(
-            path_to_file=file_source,
+            path_to_file=url,
         )
         db.execute_query(command)
 
@@ -71,14 +72,14 @@ def populate_database(db, input: list, file_source: str, ticker: str):
         command = """MATCH (a:file),(b:{tail_label}) WHERE a.path = '{path_to_file}' AND b.id = '{tail_id}' MERGE (a)<-[r:appears_in]-(b);""".format(
             tail_label=tail_label,
             tail_id=tail_id,
-            path_to_file=file_source,
+            path_to_file=url,
         )
         db.execute_query(command)
         # Match tail entity to file
         command = """MATCH (a:file),(b:{head_label}) WHERE a.path = '{path_to_file}' AND b.id = '{head_id}' MERGE (a)<-[r:appears_in]-(b);""".format(
             head_label=head_label,
             head_id=head_id,
-            path_to_file=file_source,
+            path_to_file=url,
         )
         db.execute_query(command)
 

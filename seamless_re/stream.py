@@ -1,7 +1,7 @@
-from secedgar import FilingType, CompanyFilings
+from secedgar import FilingType, CompanyFilings, filings
 import datetime
 
-def cik_lookup(search: str):
+def cik_lookup(search):
     return search
 
 def filing_lookup(cik, filing_type = FilingType.FILING_SC13D, user_agent = "dat.pull@protonmail.com", count = 10):
@@ -14,9 +14,10 @@ def filing_lookup(cik, filing_type = FilingType.FILING_SC13D, user_agent = "dat.
         client=None, 
         count=count, 
         ownership='include', 
-        match_format='ALL', **kwargs)
+        # match_format='ALL',
+        )
         
-    return filings
+    return filings.get_urls_safely()
 
 def get_urls(filings):
     safe_urls = filings.get_urls_safely()
@@ -28,6 +29,15 @@ def save_filings(filings, dir = "/tmp"):
         file_pattern = "{accession_number}"
     )
     return None
+
+if __name__=="__main__":
+    my_filings = filings(cik_lookup="tkc",
+                     filing_type=FilingType.FILING_SC13D,
+                     user_agent="dat.pull@protonmail.com")
+    my_filings.save(
+        dir_pattern = "/tmp/cik_{cik}/{type}",
+        file_pattern = "{accession_number}"
+    )
 
 
 

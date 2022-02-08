@@ -1,7 +1,9 @@
 from sec_edgar_downloader import Downloader
+import secedgar
 import glob
 from bs4 import BeautifulSoup
 import re
+import os
 
 def text_extract_13D(path):
     """
@@ -50,6 +52,36 @@ def get_id_and_background(ticker, amount=1, filing_type="SC 13D",download_path="
     print("Data collection complete.")
     return text_blobs, htmls
 
+
+def secedgar_method(ticker, amount = 1, download_path="/tmp", count = 1):
+    my_filings = secedgar.filings(cik_lookup="tkc",
+                     filing_type=secedgar.FilingType.FILING_SC13D,
+                     count = count,
+                     user_agent="dat.pull@protonmail.com")
+    urls = my_filings.get_urls_safely().get(ticker)
+    if not os.path.exists('data'): os.mkdir('data')
+    try:
+        download_count = len(glob.glob(f"{download_path}/cik_{ticker}/SC 13D/*.txt"))
+        print(download_count)
+        if download_count < count:
+            my_filings.save(
+                directory=download_path,
+                dir_pattern = "cik_{cik}/{type}",
+                file_pattern = "{accession_number}"
+            )
+        files = glob.glob(f"{download_path}/cik_{ticker}/SC 13D/*.txt")
+        text_blobs = []
+        for file in files:
+            text_blobs.append(text_extract_13D(file))
+        return urls, text_blobs[:count]
+    except Exception as e:
+        raise e
+    
+
+
 if __name__ == "__main__":
-    test = get_id_and_background("TKC")
-    print(test[1])
+    # test = get_id_and_background("TKC")
+    # print(test[1])
+    urls, text_blobs = secedgar_method('tkc', count = 1)
+    print(urls)
+    print(text_blobs)

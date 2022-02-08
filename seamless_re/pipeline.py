@@ -4,7 +4,7 @@ import pandas as pd
 from seamless_re.utils import read_file
 from seamless_re.ner import spacy_ner, coreference
 from seamless_re.relation import relation_extraction_spacy
-from seamless_re.collection import get_id_and_background
+from seamless_re.collection import get_id_and_background, secedgar_method
 
 import logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
@@ -16,7 +16,7 @@ except LookupError:
     nltk.download("punkt")
 
 
-def process(text: str, ticker,index, ner=spacy_ner, relation=relation_extraction_spacy):
+def process(text: str,url: str, ticker,index, ner=spacy_ner, relation=relation_extraction_spacy):
     triples = []
     # preform coreference: "Joe Biden is president. He lives in Deleware." -> "Joe Biden is president. Joe Biden lives in Deleware."
     text = coreference(text=text)
@@ -35,6 +35,7 @@ def process(text: str, ticker,index, ner=spacy_ner, relation=relation_extraction
 
         df = pd.concat(triples).sort_values(by="score", ascending=False).drop_duplicates(keep="first",subset=['head','tail']).reset_index(drop=True)
         df['ticker'] = ticker
+        df['url'] = url
         return df
         
     return pd.DataFrame(columns=["head","head_label","head_id","relation","tail","tail_label","tail_id","ticker","score"])
@@ -46,14 +47,14 @@ if __name__ == "__main__":
     count = sys.argv[2]
     
     # text = read_file(file_path)
-    filings = get_id_and_background(ticker, count)
+    urls, filings = secedgar_method(ticker, count)
     if len(filings) == 0:
         print(f"No filings found for {ticker}")
     else:
         i = 0
-        for text in filings:
+        for text, url in zip(filings, urls):
             # print(text)
-            output= process(text, ticker, index= i)
+            output= process(text, url, ticker, index= i)
             i += 1
 
             print(output)

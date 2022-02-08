@@ -15,8 +15,8 @@ def populate_database(db, path):
             db.execute_query(line)
 
 
-def get_users(db):
-    command = "MATCH (n:User) RETURN n;"
+def get_orgs(db):
+    command = "MATCH (n:ORG) RETURN n;"
     users = db.execute_and_fetch(command)
 
     user_objects = []
@@ -60,16 +60,22 @@ def get_graph(db):
         n1 = relationship['n1']
         if not (n1.id in added_nodes):
             if 'path' in n1.properties:
-                data = {"id": n1.id, "name": n1.properties['name'], "path": n1.properties['path']}
+                data = {
+                    "id": n1.id,
+                    "name": n1.properties['name'],
+                    "path": n1.properties['path']}
             else:
-                data = {"id": n1.id, "name": n1.properties['name']}
+                data = {"id": n1.id,"name": n1.properties['name'], "type": n1.properties['type']}
             node_objects.append(data)
             added_nodes.append(n1.id)
 
         n2 = relationship['n2'] 
         if not (n2.id in added_nodes):
             if 'path' in n2.properties:
-                data = {"id": n2.id, "name": n2.properties['name'], "path": n2.properties['path']}
+                data = {
+                    "id": n2.id,
+                    "name": n2.properties['name'],
+                    "path": n2.properties['path']}
             else:
                 data = {"id": n2.id, "name": n2.properties['name']}
             node_objects.append(data)
