@@ -81,11 +81,14 @@
         d3.select("#tooltip_svg_01")
             .style("left", (d3.event.pageX+10)+"px")
             .style("top", (d3.event.pageY-10)+"px");
+        d3.select("#tooltip_header")
+            .text(d['name']);
         d3.select("#value_tt_01")
             .text(d['name'] + ',' + d['id']);
         d3.select('#link_tt_01')
             .attr("href", d['path'])
-            .text(d['id'] + ',' + d['id']);
+            .text("Link to filing")
+            // .text(d['id'] + ',' + d['id']);
    
         //Show the tooltip
         d3.select("#tooltip_svg_01").style('opacity', 1);

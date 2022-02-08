@@ -49,3 +49,7 @@ def get_id_and_background(ticker, amount=1, filing_type="SC 13D",download_path="
         text_blobs.append(text_extract_13D(html))
     print("Data collection complete.")
     return text_blobs, htmls
+
+if __name__ == "__main__":
+    test = get_id_and_background("TKC")
+    print(test[1])

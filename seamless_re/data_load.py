@@ -54,10 +54,10 @@ def populate_database(db, input: list, file_source: str, ticker: str):
         i = 1
         # make head node
         # Update if node does not exist
-        command = """MERGE (n:{entiy_type} {{ name: '{head}', id: '{head_id}'}});""".format(entiy_type = head_label,head=head,head_id=head_id)
+        command = """MERGE (n:{entiy_type} {{ name: '{head}', type: '{head_label}', id: '{head_id}'}});""".format(entiy_type = head_label,head=head,head_id=head_id, head_label=head_label)
         db.execute_query(command)
         # Make tail node
-        command = """MERGE (n:{entiy_type} {{ name: '{tail}', id: '{tail_id}'}});""".format(entiy_type = tail_label,tail=tail,tail_id=tail_id)
+        command = """MERGE (n:{entiy_type} {{ name: '{tail}', type: '{tail_label}', id: '{tail_id}'}});""".format(entiy_type = tail_label,tail=tail,tail_id=tail_id, tail_label=tail_label)
         db.execute_query(command)
 
         #### Make relations
