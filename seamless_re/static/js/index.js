@@ -31,6 +31,7 @@
         .enter().append("line");
 
     var node = g.append("g")
+        .attr("id", "circleCustomTooltip") // added
         .attr("class", "nodes")
         .selectAll("circle")
         .data(responseJSON.nodes)
@@ -41,9 +42,69 @@
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
+    
+    var tooltip = d3.select("body")
+       .append("div")
+       .attr('class','tooltipdiv')
+       .style("position", "absolute")
+       .style("z-index", "10")
+       .style("visibility", "hidden")
+        // added from https://www.d3-graph-gallery.com/graph/interactivity_tooltip.html
+       .style("background-color", "white")
+       .style("border", "solid")
+       .style("border-width", "1px")
+       .style("border-radius", "5px")
+       .style("padding", "10px")
+       .html("<p>I'm a tooltip written in HTML</p><img src='https://github.com/holtzy/D3-graph-gallery/blob/master/img/section/ArcSmal.png?raw=true'></img><br>Fancy<br><span style='font-size: 40px;'>Isn't it?</span>");
+        // end
+    //    .text("node tooltip");
+
+    // kinda works
+    // node.on("click", function(d){
+    //     d3.select(this).classed('hovernode', true)
+    //     return tooltip.style("visibility", "visible").html();})
+    //     .on("mousemove", function(){return tooltip.style("top",
+    //         (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+    //     .on("mouseout", function(){
+    //     d3.select(this).classed('hovernode', false)
+    //     return tooltip.style("visibility", "hidden");});
+
+    // http://jsfiddle.net/cyril123/9u9a30y4/9/
+    node.on("mouseover", function(d) {
+        console.log('mouseover: ' + d3.select(this));
+        // var xPosition = parseFloat(d3.select(this).attr("cx")) + scatter_radius;
+        // var yPosition = parseFloat(d3.select(this).attr("cy"));
+        //console.log(xPosition + ',' + yPosition);
+        console.log('1. ' + d3.select(this));
+        //Update the tooltip position and value
+
+        d3.select("#tooltip_svg_01")
+            .style("left", (d3.event.pageX+10)+"px")
+            .style("top", (d3.event.pageY-10)+"px");
+        d3.select("#tooltip_header")
+            .text(d['name']);
+        d3.select("#value_tt_01")
+            .text("Type: " + d['type']);
+        d3.select('#link_tt_01')
+            .attr("href", d['path'])
+            .text("Link to filing")
+            // .text(d['id'] + ',' + d['id']);
+   
+        //Show the tooltip
+        d3.select("#tooltip_svg_01").style('opacity', 1);
+   })    
 
     node.append("title")
         .text(function(d) { return d.name; });
+    
+    node.append("p")
+        .text(function(d) { return d.id; })
+    
+    node.append("p")
+        .text(function(d) { return d.path; })
+    
+    // https://stackoverflow.com/questions/49357718/both-single-and-double-click-on-a-node-in-d3-force-directed-graph
+    // node.on("click",function(d){ return tooltip.style("visibility", "visible").text(d.name); })
 
     simulation
         .nodes(responseJSON.nodes)

@@ -19,20 +19,23 @@ def index():
 @app.route('/', methods=['POST'])
 def submit_query():
     ticker = request.form['text']
-    processed_ticker = ticker.upper()
+    # processed_ticker = ticker.upper()
 
     db = Memgraph()
     db_operations.clear(db)
-    filings, file_paths = collection.get_id_and_background(processed_ticker, 3)
+    # filings, file_paths = collection.get_id_and_background(processed_ticker, 20)
+    import asyncio
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    urls, filings = collection.secedgar_method(ticker, count=10)
     if len(filings) == 0:
         pass
     else:
         from seamless_re.pipeline import process
         i = 0
-        for text, file_path in zip(filings, file_paths):
-            data= process(text, ticker, index= i)
+        for text, url in zip(filings, urls):
+            data= process(text,url, ticker, index= i)
             i += 1
-            data_load.populate_database(db, input=data,file_source=file_path)
+            data_load.populate_database(db, input=data, ticker=ticker)
     return render_template('index.html')
 
 @app.route('/query')
@@ -46,11 +49,11 @@ def get_graph():
         jsonify(db_operations.get_graph(db)), 200)
     return response
 
-@app.route('/get-users', methods=["POST"])
+@app.route('/get-orgs', methods=["POST"])
 def get_users():
     db = Memgraph()
     response = make_response(
-        jsonify(db_operations.get_users(db)), 200)
+        jsonify(db_operations.get_orgs(db)), 200)
     return response
 
 @app.route('/get-relationships', methods=["POST"])

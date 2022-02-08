@@ -23,6 +23,7 @@ sec-edgar-downloader = "^4.2.2"
 flask = "^1.1.2"
 pymgclient = "1.1.0"
 html2text = "^2020.1.16"
+secedgar = { git = "https://github.com/sec-edgar/sec-edgar.git" }
 
 
 [tool.poetry.dev-dependencies]
