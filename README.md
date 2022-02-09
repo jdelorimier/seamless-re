@@ -1,11 +1,33 @@
-# Seamless Relation Extraction
+# Disclosed: AI-Powered Network Discovery
 
 ## About
 
-The goal of this project is to extract entities of interest and link their relationships.
+This application connects to the US SEC archives EDGAR, and parses beneficial ownership information into a graph database. In this app, we leverage two layers of machine learning text enrichment models: 
+1. NER (Named Entity Recognition)
+2. NRE (Nural Relationship Extraction)
+
+The final product is mapped into a graph database.
 
 
 ## Installation
+
+## Quick start
+
+#### Docker Compose
+
+Start up app with:
+```
+docker-compose build
+docker-compose up
+```
+
+#### Run Locally
+See below on Poetry dependency manager installation
+
+```
+poetry shell
+bash start.sh
+```
 
 ### Poetry dependency manager
 
@@ -19,17 +41,6 @@ To enter into the virtual enviorment run
 ```
 poetry shell
 ```
-
-## Quick start
-
-#### Development notebooks
-
-View shell pipeline in `./notebooks/dev-nb.ipynb`
-
-#### Development pipeline
-
-Primary pipeline development will occur in `./seamless_re/pipeline.py`
-
 
 ### Dependincies issues
 
